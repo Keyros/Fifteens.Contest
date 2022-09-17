@@ -1,29 +1,22 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-
-using System.Diagnostics;
+using Fifteens.Contest;
 
 Console.WriteLine("Hello, World!");
 
 var processorsCount = Environment.ProcessorCount;
 const int countToOutput = 100;
 
-var tasks = Enumerable.Range(1, countToOutput)
+var inputProcessors = Enumerable.Range(1, countToOutput)
     .Chunk(countToOutput / processorsCount)
     .Select((x) => (x[0], x[^1]))
     .Select(CreateSimpleEnumerator)
-    .Select(ProcessData);
+    .Select((x, y) => new InputProcessor(x, y.ToString()));
+
+var tasks = inputProcessors.Select(x => x.ProcessData());
 
 Console.WriteLine(string.Join(',', await Task.WhenAll(tasks)));
 
-async Task<string> ProcessData(IAsyncEnumerable<int> data, int i)
-{
-    Console.WriteLine($"Chunk {i} started at {DateTime.Now.TimeOfDay}");
-    var stopwatch = Stopwatch.StartNew();
-    var result = string.Join(',', await data.ToListAsync());
-    Console.WriteLine($"Chunk {i} completed. Elapsed time: {stopwatch.Elapsed}");
-    return result;
-}
 
 async IAsyncEnumerable<int> CreateEnumerator((int start, int end) input)
 {
@@ -43,6 +36,8 @@ async IAsyncEnumerable<int> CreateEnumerator((int start, int end) input)
 }
 
 
-IAsyncEnumerable<int> CreateSimpleEnumerator((int start, int end) input) => Enumerable.Range(input.start, input.end - input.start + 1).ToAsyncEnumerable();
+IAsyncEnumerable<int> CreateSimpleEnumerator((int start, int end) input) =>
+    Enumerable.Range(input.start, input.end - input.start + 1).ToAsyncEnumerable();
+
 Console.WriteLine("Completed.");
 Console.ReadLine();
