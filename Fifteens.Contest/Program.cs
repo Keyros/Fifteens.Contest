@@ -10,7 +10,7 @@ const int countToOutput = 100;
 var inputProcessors = Enumerable.Range(1, countToOutput)
     .Chunk(countToOutput / processorsCount)
     .Select((x) => (start: x[0], end: x[^1]))
-    .Select(x => new ContestEnumerator(x))
+    .Select(x => new SimpleContestEnumerator(x))
     .Select((x, y) => new InputProcessor(x, y.ToString()));
 
 var tasks = inputProcessors.Select(x => x.ProcessData());
