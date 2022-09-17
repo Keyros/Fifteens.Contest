@@ -6,47 +6,43 @@ using System.Diagnostics;
 Console.WriteLine("Hello, World!");
 
 var processorsCount = Environment.ProcessorCount;
-var countToOutput = 100;
+const int countToOutput = 100;
 
 var tasks = Enumerable.Range(1, countToOutput)
     .Chunk(countToOutput / processorsCount)
-    .Select(CreateEnumerator)
+    .Select((x) => (x[0], x[^1]))
+    .Select(CreateSimpleEnumerator)
     .Select(ProcessData);
 
-foreach (var data in await Task.WhenAll(tasks))
-{
-    Console.WriteLine(data);
-}
+Console.WriteLine(string.Join(',', await Task.WhenAll(tasks)));
 
 async Task<string> ProcessData(IAsyncEnumerable<int> data, int i)
 {
-    Console.WriteLine($"Chunk {i} started");
+    Console.WriteLine($"Chunk {i} started at {DateTime.Now.TimeOfDay}");
     var stopwatch = Stopwatch.StartNew();
     var result = string.Join(',', await data.ToListAsync());
-    Console.WriteLine($"Chunk {i} completed: {stopwatch.Elapsed}");
+    Console.WriteLine($"Chunk {i} completed. Elapsed time: {stopwatch.Elapsed}");
     return result;
-
 }
 
-async IAsyncEnumerable<int> CreateEnumerator(IEnumerable<int> data)
+async IAsyncEnumerable<int> CreateEnumerator((int start, int end) input)
 {
     var rnd = new Random();
-    var dataAsList = data.ToList();
-    var start = dataAsList.Min();
-    var finish = dataAsList.Max();
+    var start = input.start;
+    var finish = input.end;
     do
     {
-        var number = rnd.Next();
+        await Task.Yield();
+        var number = rnd.Next(start, finish);
         if (number == start)
         {
             yield return number;
             start++;
         }
-
-    } while (start < finish);
-
+    } while (start < finish + 1);
 }
 
-IAsyncEnumerable<int> CreateSimpleEnumerator(IEnumerable<int> data) => data.ToAsyncEnumerable();
 
+IAsyncEnumerable<int> CreateSimpleEnumerator((int start, int end) input) => Enumerable.Range(input.start, input.end - input.start + 1).ToAsyncEnumerable();
+Console.WriteLine("Completed.");
 Console.ReadLine();
