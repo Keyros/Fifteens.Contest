@@ -14,9 +14,13 @@ public sealed class SimpleContestEnumerator : IAsyncEnumerator<int>, IAsyncEnume
 
     public async ValueTask<bool> MoveNextAsync()
     {
-        await Task.Yield();
+        if (Current == _finish)
+        {
+            return false;
+        }
+        await Task.Delay(1000);
         Current++;
-        return Current < _finish + 1;
+        return Current <= _finish;
     }
 
     public int Current { get; private set; }

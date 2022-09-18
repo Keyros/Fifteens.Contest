@@ -16,6 +16,10 @@ public sealed class ContestEnumerator : IAsyncEnumerator<int>, IAsyncEnumerable<
 
     public async ValueTask<bool> MoveNextAsync()
     {
+        if (Current == _finish)
+        {
+            return false;
+        }
         await Task.Yield();
         int number;
         do
@@ -24,8 +28,7 @@ public sealed class ContestEnumerator : IAsyncEnumerator<int>, IAsyncEnumerable<
         } while (number != Current);
 
         Current++;
-
-        return Current < _finish + 1;
+        return Current <= _finish;
     }
 
     public int Current { get; private set; }
