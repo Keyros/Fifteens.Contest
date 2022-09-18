@@ -11,7 +11,7 @@ public sealed class ContestEnumerator : IAsyncEnumerator<int>, IAsyncEnumerable<
         Current = input.start - 1;
         _rnd = new Random();
     }
-    
+
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     public async ValueTask<bool> MoveNextAsync()
