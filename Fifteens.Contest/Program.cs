@@ -28,7 +28,5 @@ await notifyTask;
 
 sateNotifier.PrintStates();
 Console.WriteLine($"Completed. Elapsed:{stopWatch.Elapsed}");
-Console.WriteLine();
-
 Console.WriteLine(string.Join(',', result.SelectMany(x => x)));
 Console.ReadLine();

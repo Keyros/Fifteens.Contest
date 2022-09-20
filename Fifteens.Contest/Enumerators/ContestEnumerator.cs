@@ -1,37 +1,28 @@
 namespace Fifteens.Contest.Enumerators;
 
-public sealed class ContestEnumerator : IAsyncEnumerator<int>, IAsyncEnumerable<int>
+public sealed class ContestEnumerator : ContestEnumeratorBase
 {
-    private readonly int _finish;
-    private readonly Random _rnd;
-
-    public ContestEnumerator((int start, int end) input)
+    public ContestEnumerator((int start, int end) input) : base(input)
     {
-        _finish = input.end;
-        Current = input.start - 1;
-        _rnd = new Random();
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
-
-    public async ValueTask<bool> MoveNextAsync()
+    protected override async Task<int> GetNext(int current)
     {
-        if (Current == _finish)
-        {
-            return false;
-        }
-        await Task.Yield();
-        int number;
-        do
-        {
-            number = _rnd.Next();
-        } while (number != Current);
-
-        Current++;
-        return Current <= _finish;
+        var numberTask = await Task.WhenAny(Enumerable.Range(0, 1).Select(x => Test(current)));
+        return await numberTask;
     }
 
-    public int Current { get; private set; }
+    private static Task<int> Test(int current)
+    {
+        return Task.Factory.StartNew(() =>
+        {
+            int number;
+            do
+            {
+                number = Random.Shared.Next();
+            } while (number != current + 1);
 
-    public IAsyncEnumerator<int> GetAsyncEnumerator(CancellationToken cancellationToken = default) => this;
+            return number;
+        }, TaskCreationOptions.LongRunning);
+    }
 }

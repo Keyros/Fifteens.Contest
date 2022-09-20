@@ -1,29 +1,14 @@
 namespace Fifteens.Contest.Enumerators;
 
-public sealed class SimpleContestEnumerator : IAsyncEnumerator<int>, IAsyncEnumerable<int>
+public sealed class SimpleContestEnumerator : ContestEnumeratorBase
 {
-    private readonly int _finish;
-
-    public SimpleContestEnumerator((int start, int end) input)
+    public SimpleContestEnumerator((int start, int end) input) : base(input)
     {
-        _finish = input.end;
-        Current = input.start - 1;
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
-
-    public async ValueTask<bool> MoveNextAsync()
+    protected override async Task<int> GetNext(int current)
     {
-        if (Current == _finish)
-        {
-            return false;
-        }
         await Task.Delay(1000);
-        Current++;
-        return Current <= _finish;
+        return current + 1;
     }
-
-    public int Current { get; private set; }
-
-    public IAsyncEnumerator<int> GetAsyncEnumerator(CancellationToken cancellationToken = default) => this;
 }
