@@ -6,7 +6,7 @@ Console.WriteLine("Hello, World!");
 
 var processorsCount = Environment.ProcessorCount;
 const int countToOutput = 100;
-
+return;
 var inputProcessors = Enumerable.Range(1, countToOutput)
     .Chunk(countToOutput / processorsCount)
     .Select(x => (start: x[0], end: x[^1]))
