@@ -2,20 +2,14 @@ namespace Fifteens.Contest;
 
 public sealed class SateNotifier
 {
-    private readonly List<InputProcessor> _inputProcessors;
-
-    public SateNotifier(List<InputProcessor> inputProcessors)
+    public Task Run(IEnumerable<InputProcessor> inputProcessors) => Task.Factory.StartNew(() =>
     {
-        _inputProcessors = inputProcessors;
-    }
-
-    public Task Run() => Task.Factory.StartNew(() =>
-    {
+        var data = inputProcessors.ToList();
         do
         {
             Thread.Sleep(TimeSpan.FromMilliseconds(500));
-            PrintSates(_inputProcessors);
-        } while (!_inputProcessors.All(x => x.Complete));
+            PrintSates(data);
+        } while (!data.All(x => x.Complete));
     }, TaskCreationOptions.LongRunning);
 
     private static void PrintSates(IEnumerable<InputProcessor> inputProcessors)
@@ -37,5 +31,6 @@ public sealed class SateNotifier
            $"Processed = {state.Processed}\t, Elapsed = {state.Elapsed}, " +
            $"Progress = {state.Progress * 100}%\t, Complete = {state.Complete}";
 
-    public void PrintStates() => PrintSates(_inputProcessors);
+    public void PrintStates(IEnumerable<InputProcessor> inputProcessors)
+        => PrintSates(inputProcessors);
 }
