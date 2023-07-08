@@ -9,17 +9,14 @@ public sealed class SateNotifier
         _inputProcessors = inputProcessors;
     }
 
-    public Task Run()
+    public Task Run() => Task.Factory.StartNew(() =>
     {
-        return Task.Factory.StartNew(() =>
+        do
         {
-            do
-            {
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
-                PrintSates(_inputProcessors);
-            } while (!_inputProcessors.All(x => x.Complete));
-        }, TaskCreationOptions.LongRunning);
-    }
+            Thread.Sleep(TimeSpan.FromMilliseconds(500));
+            PrintSates(_inputProcessors);
+        } while (!_inputProcessors.All(x => x.Complete));
+    }, TaskCreationOptions.LongRunning);
 
     private static void PrintSates(IEnumerable<InputProcessor> inputProcessors)
     {
@@ -35,7 +32,7 @@ public sealed class SateNotifier
         Console.WriteLine(new string('*', 80));
     }
 
-    private static string CreateString(State state) 
+    private static string CreateString(State state)
         => $"Name: {state.Name}, ToProcess = {state.ToProcess}, " +
            $"Processed = {state.Processed}\t, Elapsed = {state.Elapsed}, " +
            $"Progress = {state.Progress * 100}%\t, Complete = {state.Complete}";

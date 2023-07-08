@@ -8,7 +8,7 @@ public sealed class ContestEnumerator : ContestEnumeratorBase
 
     protected override async Task<int> GetNext(int current)
     {
-        var numberTask = await Task.WhenAny(Enumerable.Range(0, 1).Select(x => Test(current)));
+        var numberTask = await Task.WhenAny(Enumerable.Range(0, 1).Select(_ => Test(current)));
         return await numberTask;
     }
 
