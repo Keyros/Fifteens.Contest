@@ -1,6 +1,6 @@
 namespace Fifteens.Contest.Enumerators;
 
-public abstract class ContestEnumeratorBase : IAsyncEnumerator<int>, IAsyncEnumerable<int>
+internal abstract class ContestEnumeratorBase : IAsyncEnumerator<int>, IAsyncEnumerable<int>
 {
     private readonly int _finish;
 

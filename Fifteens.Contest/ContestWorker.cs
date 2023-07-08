@@ -9,16 +9,13 @@ public sealed class ContestWorker : BackgroundService
 {
     private readonly ILogger<ContestWorker> _logger;
     private readonly IEnumeratorSourceFactory _enumeratorSourceFactory;
-    private readonly SateNotifier _sateNotifier;
     private readonly IHostApplicationLifetime _applicationLifetime;
 
     public ContestWorker(ILogger<ContestWorker> logger, IEnumeratorSourceFactory enumeratorSourceFactory,
-        SateNotifier sateNotifier,
         IHostApplicationLifetime applicationLifetime)
     {
         _logger = logger;
         _enumeratorSourceFactory = enumeratorSourceFactory;
-        _sateNotifier = sateNotifier;
         _applicationLifetime = applicationLifetime;
     }
 
@@ -37,7 +34,7 @@ public sealed class ContestWorker : BackgroundService
 
         var tasks = inputProcessors.Select(x => x.ProcessData());
 
-        var notifyTask = _sateNotifier.Run(inputProcessors);
+        var notifyTask = inputProcessors.GetNotifyTask();
 
         var stopWatch = Stopwatch.StartNew();
         var enumeration = await Task.WhenAll(tasks);
@@ -46,7 +43,7 @@ public sealed class ContestWorker : BackgroundService
 
         await notifyTask;
 
-        _sateNotifier.PrintStates(inputProcessors);
+        inputProcessors.PrintSates();
         _logger.LogInformation("Completed. Elapsed:{StopWatchElapsed}", stopWatch.Elapsed);
         _logger.LogInformation("{Data}", string.Join(',', result.SelectMany(x => x)));
         _applicationLifetime.StopApplication();

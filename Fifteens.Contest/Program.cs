@@ -8,7 +8,6 @@ await Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
     {
         services.AddTransient<IEnumeratorSourceFactory, EnumeratorSourceFactory>();
-        services.AddTransient<SateNotifier>();
         services.AddHostedService<ContestWorker>();
     })
     .Build()

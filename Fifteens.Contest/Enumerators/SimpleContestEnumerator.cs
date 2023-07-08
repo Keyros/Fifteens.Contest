@@ -1,6 +1,6 @@
 namespace Fifteens.Contest.Enumerators;
 
-public sealed class SimpleContestEnumerator : ContestEnumeratorBase
+internal sealed class SimpleContestEnumerator : ContestEnumeratorBase
 {
     public SimpleContestEnumerator((int start, int end) input) : base(input)
     {
